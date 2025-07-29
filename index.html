@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新建实验表格</title>
+    <style>
+        /* 表格主容器样式 */
+        .chem-table-container {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 表头容器样式 */
+        .table-header-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        /* 表头标签样式 */
+        .table-header-container span {
+            margin-right: 5px;
+            font-weight: bold;
+        }
+
+        /* 表头单元格样式 */
+        .table-header-container td {
+            border: 1px solid #ddd;
+            padding: 5px;
+            min-width: 100px;
+        }
+
+        /* 表格内容容器样式 */
+        .table-content-container {
+            overflow-x: auto;
+        }
+
+        /* 表格样式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        /* 表格单元格样式 */
+        table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        /* 可编辑单元格样式 */
+        td[contenteditable="true"] {
+            background-color: #f9f9f9;
+            cursor: text;
+        }
+
+        /* 按钮容器样式 */
+        .table-button-container {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* 表格操作按钮样式 */
+        .table-action-button {
+            padding: 5px 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .table-action-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 悬浮窗样式 */
+        .floating-window {
+            position: absolute;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        /* 悬浮窗手柄样式 */
+        .floating-handle {
+            background-color: #f0f0f0;
+            padding: 5px;
+            cursor: grab;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 新建实验按钮 -->
+    <button id="create-exp-button">新建实验</button>
+    <!-- 目标容器，表格将被添加到这里 -->
+    <div id="target-div-id"></div>
+
+    <!-- 引入 table.js 文件 -->
+    <script src="/static/table.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 创建 Chem_Operator 实例
+            const chemOperator = new Chem_Operator();
+            // 内部计数器
+            let expCounter = 0;
+
+            // 获取新建实验按钮元素
+            const createExpButton = document.getElementById('create-exp-button');
+
+            // 为按钮添加点击事件监听器
+            createExpButton.addEventListener('click', async function () {
+                const expName = '空名字实验';
+                const expId = `exp_${expCounter++}`; // 使用计数器生成唯一的 rootId
+
+                try {
+                    const response = await fetch('/create_exp', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            exp_name: expName,
+                            exp_id: expId
+                        })
+                    });
+
+                    const json_response = await response.json();
+                    chemOperator.handle_response(json_response, 'target-div-id');
+                } catch (error) {
+                    console.error('创建实验时出错：', error);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
